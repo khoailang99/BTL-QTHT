@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<style>
+	#btn-add-point-middle{
+		position: absolute;
+	    top: 40%;
+	    border: none;
+	    border-radius: 5px;
+	    padding: 10px;
+	    font-size: 16px;
+	    cursor: pointer;
+	    outline: none;
+	}
+	.note{
+		position: absolute;
+	    top: 45%;
+	    font-style: italic;
+	}
+
+</style>
+<body>
+<p style="font-style: italic">
+	*Note: <br>
+	Màu Đỏ : Điểm đã được chọn để nối! <br>
+	Màu Xanh : Điểm Trung Gian!
+</p>
+<button id='btn-add-point-middle'> Thêm điểm trung gian </button>
+<p class="note">Bước 1: Chọn điểm bắt đầu ( nếu chưa có) <br> Bước 2: Chọn điểm trung gian <br> Bước 3 : Chọn điểm kết thúc </p>
+<canvas id="myCanvas" width="1200" height="850" style="border:2px solid #d3d3d3; margin: 50px 300px;">
+Your browser does not support the HTML5 canvas tag.</canvas>
+
+<script>
+
+var html_canvas=document.getElementById("myCanvas");
+var btn_add_point_middle = document.getElementById('btn-add-point-middle');
+var btn_restore = document.getElementById('btn-restore');
+var ctx=html_canvas.getContext("2d");
+var alpha = [0,'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
+var row = 10, col = 15;
+var x_original = y_original = size_square = 70;
+var coor_points = [];
+var coor_point_middle = [];
+var btn_point_middle_clicked = false;
+var cc;
+
+var radius = 6;
+
+
+ctx.font = "20px Arial";
+for(let i = 1; i <= col+1; i++){
+	ctx.beginPath();
+	ctx.strokeStyle = "black";
+	ctx.moveTo(x_original*i,y_original);
+	ctx.lineTo(x_original*i,(row*size_square)+size_square);
+	ctx.stroke();
+	ctx.textBaseline = "top";
+	ctx.fillText(alpha[i-1], x_original*i-7, (row*size_square)+size_square+10);
+}
+for(let j = 1; j<=row+1; j++){
+	ctx.beginPath();
+	ctx.strokeStyle = "black";
+    ctx.moveTo(x_original,y_original*j);
+    ctx.lineTo((col*size_square)+size_square,y_original*j);
+    ctx.stroke();
+    if(j<=row){
+    	ctx.textBaseline = "middle";
+		ctx.fillText(row - j + 1, 45, y_original*j);
+    }
+}
+
+
+add_circle();
+
+
+function add_circle(){
+	for(let i = 2; i <= row; i++){
+		for(let j = 2; j<= col; j++){
+			/*ctx.beginPath();
+			ctx.arc(j*size_square,i*size_square,5,0, 2*Math.PI);
+			ctx.lineWidth=10;
+			ctx.shadowBlur = 20;
+			ctx.shadowColor = "red";
+			ctx.strokeStyle="orange";
+			ctx.stroke();*/
+			let centerX = j*size_square;
+		  	let centerY = i*size_square;
+		  	var radius = 6;
+		  	setInterval(function () {
+			    period = 700;
+			    var linearMod = Date.now() % period / period;
+			    var mod = Math.sin(linearMod * Math.PI);
+			    var r = radius * mod;
+			    // c.width = c.width;
+			    ctx.beginPath();
+			    ctx.arc(centerX, centerY, r, 0, 2 * Math.PI, false);
+			    ctx.fillStyle = '#e67e22';
+			    ctx.fill();
+			    ctx.strokeStyle = '#ecf0f1';
+			    ctx.stroke();
+		  	}, 45);
+		}
+	}
+}
+
+btn_add_point_middle.addEventListener('click',function(){
+	if(coor_points.length >= 1){
+		btn_point_middle_clicked = !btn_point_middle_clicked;
+		if(btn_point_middle_clicked){
+			this.innerHTML = "Đã chọn thêm điểm TG";
+			this.style.color = 'red';
+		}else{
+			this.innerHTML = "Thêm điểm TG";
+			this.style.color = 'black';
+		}
+	}else{
+		alert("Bạn Phải Chọn Điểm Bắt Đầu...!");
+	}
+},false)
+
+
+html_canvas.addEventListener('click', relMouseCoords, false);
+function relMouseCoords(event){
+    var totalOffsetX = 0;
+    var totalOffsetY = 0;
+    var canvasX = 0;
+    var canvasY = 0;
+    var currentElement = this;
+    let coor_x_clicked = 0, coor_y_clicked = 0;
+    let coor_point_clicked = {x: 0, y: 0};
+    let check_limit = false;
+
+    do{
+        totalOffsetX += currentElement.offsetLeft - currentElement.scrollLeft;
+        totalOffsetY += currentElement.offsetTop - currentElement.scrollTop;
+    }
+    while(currentElement = currentElement.offsetParent)
+
+    //Lay toa do cua diem dc clich
+    canvasX = event.pageX - totalOffsetX;
+    canvasY = event.pageY - totalOffsetY;
+
+    coor_x_clicked = (canvasX - (canvasX % size_square))/size_square;
+    coor_y_clicked = (canvasY - (canvasY % size_square))/size_square;
+
+
+    if((canvasX % size_square) <= radius+4){
+    	coor_y_clicked = ((canvasY % size_square)>=size_square - radius -4)?coor_y_clicked+1:((canvasY % size_square)<=radius+4?coor_y_clicked:null);
+    	check_limit = true;
+    }else{
+    	if((canvasX % size_square) >= size_square - radius -4){
+    		coor_x_clicked += 1;
+    		coor_y_clicked = ((canvasY % size_square)>=size_square - radius -4)?coor_y_clicked+1:((canvasY % size_square)<=radius+4?coor_y_clicked:null);
+    		check_limit = true;
+    	}
+    }
+    //Het - Lay toa do cua diem dc click
+
+    if(check_limit && coor_y_clicked != null){
+    	coor_point_clicked['x'] = coor_x_clicked;
+    	coor_point_clicked['y'] = coor_y_clicked;
+		ctx.beginPath();
+		ctx.arc(coor_x_clicked*size_square, coor_y_clicked*size_square, radius+4, 0, 2 * Math.PI, false);
+	    if(btn_point_middle_clicked){
+	    	coor_point_middle.push(coor_point_clicked);
+	    	btn_point_middle_clicked = false;
+			btn_add_point_middle.innerHTML = "Thêm điểm TG";
+			btn_add_point_middle.style.color = 'black';
+		    ctx.fillStyle = '#3498db';
+		    ctx.fill();
+		    ctx.stroke();
+	    }else{
+	    	coor_points.push(coor_point_clicked);
+		    ctx.fillStyle = 'red';
+		    ctx.fill();
+		    ctx.strokeStyle = '#ecf0f1';
+		    ctx.stroke();
+	    }
+    	if(coor_points.length === 2){
+    		ctx.beginPath();
+    		ctx.moveTo(coor_points[0]["x"]*size_square,coor_points[0]["y"]*size_square); // A
+    		if(coor_point_middle.length === 1){
+    			ctx.quadraticCurveTo(coor_point_middle[0]['x']*size_square, coor_point_middle[0]['y']*size_square , coor_points[1]["x"]*size_square,coor_points[1]["y"]*size_square);
+				coor_point_middle.shift();
+    		}else{
+				ctx.lineTo(coor_points[1]["x"]*size_square,coor_points[1]["y"]*size_square); // B
+    		}
+			// ctx.lineTo(coor_points[1]["x"]*size_square,coor_points[1]["y"]*size_square); // B
+			ctx.lineWidth = 2;
+			ctx.strokeStyle = "#FF0000";
+			ctx.stroke();
+			coor_points.shift();
+    	}
+    }
+
+
+
+    console.log('x- ' + coor_point_clicked['x'] + ' y- ' + coor_point_clicked['y']);
+    console.log('td-x -- '+canvasX + ' td-y -- ' + canvasY);
+}
+HTMLCanvasElement.prototype.relMouseCoords = relMouseCoords;
+
+
+</script>
+</body>
+</html>

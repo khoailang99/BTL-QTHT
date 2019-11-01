@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	<script>
+		var info_peaks = [
+			{
+				name_peak : 'A',
+				sides : [
+					{
+						name_side: 'AB',
+						s_val_straight_para: 3,
+						next_peak : 'B'
+					},
+					{
+						name_side: 'AC',
+						s_val_straight_para: 2,
+						next_peak : 'C'
+					},
+					{
+						name_side: 'AD',
+						s_val_straight_para: 8,
+						next_peak : 'D'
+					}
+				],
+				location_in_alpha: 1,
+				side_peaks_min: [
+					{
+						spm_val_straight_para : Infinity,
+						smallest_peak : null
+					}
+				]
+			},
+			{
+				name_peak : 'B',
+				sides : [
+					{
+						name_side: 'BA',
+						s_val_straight_para: 3,
+						next_peak : 'A'
+					},
+					{
+						name_side: 'BC',
+						s_val_straight_para: 3,
+						next_peak : 'C'
+					},
+					{
+						name_side: 'BD',
+						s_val_straight_para: 2,
+						next_peak : 'D'
+					},
+					{
+						name_side: 'BE',
+						s_val_straight_para: 2,
+						next_peak : 'E'
+					}
+				],
+				location_in_alpha: 2,
+				side_peaks_min: [
+					{
+						spm_val_straight_para : 0,
+						smallest_peak : null
+					}
+				]
+			},
+			{
+				name_peak : 'C',
+				sides : [
+					{
+						name_side: 'CA',
+						s_val_straight_para: 2,
+						next_peak : 'A'
+					},
+					{
+						name_side: 'CB',
+						s_val_straight_para: 3,
+						next_peak : 'B'
+					},
+					{
+						name_side: 'CD',
+						s_val_straight_para: 9,
+						next_peak : 'D'
+					},
+					{
+						name_side: 'CE',
+						s_val_straight_para: 1,
+						next_peak : 'E'
+					},
+					{
+						name_side: 'CF',
+						s_val_straight_para: 5,
+						next_peak : 'F'
+					}
+				],
+				location_in_alpha: 3,
+				side_peaks_min: [
+					{
+						spm_val_straight_para : Infinity,
+						smallest_peak : null
+					}
+				]
+			},
+			{
+				name_peak : 'D',
+				sides : [
+					{
+						name_side: 'DA',
+						s_val_straight_para: 8,
+						next_peak : 'A'
+					},
+					{
+						name_side: 'DB',
+						s_val_straight_para: 2,
+						next_peak : 'B'
+					},
+					{
+						name_side: 'DC',
+						s_val_straight_para: 9,
+						next_peak : 'C'
+					},
+					{
+						name_side: 'DE',
+						s_val_straight_para: 1,
+						next_peak : 'E'
+					},
+					{
+						name_side: 'DF',
+						s_val_straight_para: 1,
+						next_peak : 'F'
+					}
+				],
+				location_in_alpha: 4,
+				side_peaks_min: [
+					{
+						spm_val_straight_para : Infinity,
+						smallest_peak : null
+					}
+				]
+			},
+			{
+				name_peak : 'E',
+				sides : [
+					{
+						name_side: 'ED',
+						s_val_straight_para: 1,
+						next_peak : 'D'
+					},
+					{
+						name_side: 'EF',
+						s_val_straight_para: 3,
+						next_peak : 'F'
+					},
+					{
+						name_side: 'EC',
+						s_val_straight_para: 1,
+						next_peak : 'C'
+					},
+					{
+						name_side: 'EB',
+						s_val_straight_para: 2,
+						next_peak : 'E'
+					}
+				],
+				location_in_alpha: 5,
+				side_peaks_min: [
+					{
+						spm_val_straight_para : Infinity,
+						smallest_peak : null
+					}
+				]
+			},
+			{
+				name_peak : 'F',
+				sides : [
+					{
+						name_side: 'FD',
+						s_val_straight_para: 1,
+						next_peak : 'D'
+					},
+					{
+						name_side: 'FE',
+						s_val_straight_para: 3,
+						next_peak : 'E'
+					},
+					{
+						name_side: 'FC',
+						s_val_straight_para: 5,
+						next_peak : 'C'
+					}
+				],
+				location_in_alpha: 6,
+				side_peaks_min: [
+					{
+						spm_val_straight_para : Infinity,
+						smallest_peak : null
+					}
+				]
+			}
+		];
+
+		var arr_smallest_peak = ["B"];
+		var len_arr_smallest_peak = arr_smallest_peak.length;
+		var peaks = ['A','B','C','D','E','F'];
+		var start_peak = 'B',last_peak = 'F';
+		// var arr_peaks_shortest_path = ['F'];
+		
+		var edges_peak_smallest_eq = [];
+		var sub_smallest_peak = ['F'];
+		var parent_smallest_peak = [];
+
+
+		run();
+		function run(){
+			while (arr_smallest_peak[len_arr_smallest_peak-1] !== last_peak) {
+				if(arr_smallest_peak[len_arr_smallest_peak-1] === last_peak){ break;}
+				for(let peak of info_peaks){
+					if(peak['name_peak'] === arr_smallest_peak[arr_smallest_peak.length-1]){
+						let len_side_peaks_min = peak['side_peaks_min'].length;
+						let str_next_peak = "";
+						for(let side of peak['sides']){
+							add_side_peak_min(side['s_val_straight_para'],side['next_peak'],peak['side_peaks_min'][len_side_peaks_min-1]['spm_val_straight_para'], peak['location_in_alpha']);
+							str_next_peak += side['next_peak']
+						}
+						for(let point of peaks){
+							if(str_next_peak.indexOf(point)<0 && arr_smallest_peak.indexOf(point) < 0){
+								// console.log("peak-not-connect: " + point);
+								for(let peak_not_connect of info_peaks){
+									if(peak_not_connect['name_peak'] === point){
+										let len_peak_not_cnt = peak_not_connect['side_peaks_min'].length;
+										let length_side = peak_not_connect['side_peaks_min'][len_peak_not_cnt-1];
+										peak_not_connect['side_peaks_min'].push({
+											spm_val_straight_para : length_side['spm_val_straight_para'],
+											smallest_peak : length_side['smallest_peak']
+										});
+										break;
+									}
+								}
+							}
+						}
+						r_smallest_peak();
+						break;
+					}
+				}
+			}
+			console.log(info_peaks)
+			console.log('---- info_peaks ----');
+			
+			add_arr_epse();
+			r_shortest_path();
+
+			console.log(parent_smallest_peak);
+			console.log('------- parent_smallest_peak --------');
+		}
+
+		function add_arr_epse(){
+			for(let peak of info_peaks){
+				if(peak['name_peak'] !== start_peak){
+					let len_spm = peak['side_peaks_min'].length;
+					let spm = peak['side_peaks_min'][len_spm-1];
+					let obj_spm = {
+						p_name_peak_min: '',
+						spm_equal : [],
+						len_epse : 0
+					};
+					obj_spm['p_name_peak_min'] = peak['name_peak'];
+					for(let side of peak['side_peaks_min']){
+						let elem_spm_equal = {smallest_length: 0, s_name_peak_min: ''};
+						if(side['spm_val_straight_para'] === spm['spm_val_straight_para']){
+							elem_spm_equal['smallest_length'] = side['spm_val_straight_para'];
+							elem_spm_equal['s_name_peak_min'] = side['smallest_peak'];
+							if(obj_spm['spm_equal'].length === 0){
+								obj_spm['spm_equal'].push(elem_spm_equal);
+
+							}else{
+								if(side['smallest_peak'] !== obj_spm['spm_equal'][obj_spm['spm_equal'].length-1]['s_name_peak_min']){
+									obj_spm['spm_equal'].push(elem_spm_equal);
+								}
+							}
+						}
+					}
+					obj_spm['len_epse'] = obj_spm['spm_equal'].length;
+					edges_peak_smallest_eq.push(obj_spm);
+				}
+			}
+			console.log(edges_peak_smallest_eq);
+			console.log('----- edges_peak_smallest_eq --------')
+		}
+
+		function r_shortest_path(){
+			/*let len_apsp = arr_peaks_shortest_path.length;
+ 			for(let peak of info_peaks){
+				if(peak['name_peak'] === arr_peaks_shortest_path[len_apsp-1]){
+					let len_side_peaks_min = peak['side_peaks_min'].length;
+					let ele_spm_last = peak['side_peaks_min'][len_side_peaks_min-1];
+					arr_peaks_shortest_path.push(ele_spm_last['smallest_peak']);
+					if(arr_peaks_shortest_path[len_apsp-1] !== start_peak){
+						r_shortest_path();
+					}
+				}
+			}*/
+
+			for(let elem_epse of edges_peak_smallest_eq){
+				if(elem_epse['p_name_peak_min'] === sub_smallest_peak[sub_smallest_peak.length-1]){
+					sub_smallest_peak.push(elem_epse['spm_equal'][0]['s_name_peak_min']);
+					if(elem_epse['len_epse'] > 1){
+						elem_epse['spm_equal'].shift();
+					}
+					if(sub_smallest_peak[sub_smallest_peak.length-1] !== start_peak){
+						r_shortest_path();
+					}else{
+						parent_smallest_peak.push(sub_smallest_peak);
+						check_spm_equal();
+					}
+				}
+			}
+		}
+
+		function check_spm_equal(){
+			for(let peak_min of sub_smallest_peak){
+				for(let o_spm of edges_peak_smallest_eq){
+					if(peak_min === o_spm['p_name_peak_min']){
+						if(o_spm['len_epse'] > 1 && o_spm['spm_equal'].length >=1){
+							let position_pm_contain_val = sub_smallest_peak.findIndex((val,ind)=>{return o_spm['p_name_peak_min'] === val;})
+							sub_smallest_peak = sub_smallest_peak.slice(0,position_pm_contain_val+1);
+							// console.log('vi-tri:' + sub_smallest_peak);
+							r_shortest_path();
+						}
+						break;
+					}
+				}
+			}
+		}
+
+		function r_smallest_peak(){
+			// console.log(info_peaks);
+			let smallest_edeg = order_peak = Infinity;
+			let name_peak = '';
+			for(let peak of info_peaks){
+				let len_side_peaks_min = peak['side_peaks_min'].length;
+				if(arr_smallest_peak.indexOf(peak['name_peak']) < 0){
+					let length_side = peak['side_peaks_min'][len_side_peaks_min - 1]['spm_val_straight_para'];
+					/*if(arr_smallest_peak[len_arr_smallest_peak-1] === 'C'){
+						console.log('ten-dinh- ' + peak['name_peak'] + ' do-dai- ' + length_side);
+						console.log(peak);
+					}*/
+					if(length_side < smallest_edeg){
+						name_peak = peak['name_peak'];
+						order_peak = peak['location_in_alpha'];
+						smallest_edeg = length_side;
+					}
+					if(length_side === smallest_edeg){
+						name_peak = (peak['location_in_alpha'] < order_peak)?peak['name_peak']:name_peak;
+						order_peak = (peak['location_in_alpha'] < order_peak)?peak['location_in_alpha']:order_peak;
+						smallest_edeg = length_side;
+					}
+					/*console.log('name_peak - ' + name_peak);
+					console.log('order_peak - ' + order_peak);
+					console.log('smallest_edeg - ' + smallest_edeg);
+					console.log('-------');*/
+					// console.log('dinh-duoc-duyet: '+peak['name_peak'])
+				}
+			}
+			// console.log('dnn - '+name_peak);
+			arr_smallest_peak.push(name_peak);
+			len_arr_smallest_peak = arr_smallest_peak.length;
+		}
+
+		function add_side_peak_min(val_straight_para,next_peak,side_with_peak_min,location_peak){
+			// console.log('dinh_den_of_'+dinh_den+ ' - ' + next_peak);
+			if(arr_smallest_peak.indexOf(next_peak) < 0){
+				for(let peak of info_peaks){
+					if(peak['name_peak'] === next_peak){
+						let len_side_peaks_min = peak['side_peaks_min'].length;
+						let length_side = peak['side_peaks_min'][len_side_peaks_min-1];
+						let total = val_straight_para+side_with_peak_min;
+						if(total <= length_side['spm_val_straight_para']){
+							peak['side_peaks_min'].push({
+								spm_val_straight_para : total,
+								smallest_peak : arr_smallest_peak[len_arr_smallest_peak-1],
+								smallest_peak: (total === length_side['spm_val_straight_para'] && peak['location_in_alpha'] < location_peak)?length_side['smallest_peak']:arr_smallest_peak[len_arr_smallest_peak-1]
+							});
+						}else{
+							peak['side_peaks_min'].push({
+								spm_val_straight_para : length_side['spm_val_straight_para'],
+								smallest_peak : length_side['smallest_peak']
+							});
+						}
+						break;
+					}
+				}
+			}
+		}
+
+		// console.log(arr_smallest_peak_peak);
+		// console.log(info_peaks);ss
+	</script>
+</body>
+</html>
