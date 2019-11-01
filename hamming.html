@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Mã Hamming</title>
+</head>
+<body>
+	<style>
+		body{
+			font-size: 24px;
+		}
+		.wrapper{
+			width: 1200px;
+			margin: auto;
+		}
+		.container{
+			background: #e4e2e2;
+			border-radius: 7px;
+			padding: 10px;
+		}
+		.section-type{
+			display: flex;
+			align-items: center;
+		}
+		.lable-radio{
+			margin-left: 15px;
+			line-height: 18px;
+		}
+		.c-radio{
+			width: 18px;
+			height: 18px;
+			border-radius: 50%;
+			background: #ff5d5d;
+			padding: 5px;
+			box-sizing: border-box;
+			opacity: 0.5;
+		}
+		.radio-character-in:hover,.radio-hamming-code:hover,.radio-get-ham-code:hover{
+			cursor: pointer;
+		}
+		.elem_clicked{
+			background: red;
+			opacity: 1;
+			box-shadow: 5px 10px 15px #888888, -5px -10px 15px #888888;
+		}
+		.ham-code-1,.ham-code-2,.ham-code-3{
+			width: 900px;
+			height: 600px;
+			overflow: hidden;
+		}
+		img{width: 100%; height: 100%;}
+		a{
+			color: black;
+		}
+	</style>
+	<div class="wrapper">
+		<div class="container">
+			<h5 class="title-nonte" style="margin:0;">*Click vào hình tròn đỏ để chọn kiểu...!</h4>
+			<div class="section-character-in section-type">
+				<div class="radio-character-in c-radio"></div>
+				<p class="lable-character-in lable-radio"> Gửi 1 kí tự ( Lấy mã nhị phân )</p>
+			</div>
+
+			<div class="section-get-ham-code section-type">
+				<div class="radio-get-ham-code c-radio"></div>
+				<p class="lable-get-ham-code lable-radio"> Gửi mã nhị phân (Lấy mã Hamming) </p>
+			</div>
+
+			<div class="section-hamming section-type">
+				<div class="radio-hamming-code c-radio"></div>
+				<p class="lable-ham-code lable-radio"> Gửi mã Hamming ( Để Tìm Lỗi ) </p>
+			</div>
+
+			<div class="section-enter-display">
+				<div class="form-enter">
+					<input type="text" class="in-bi-ham">
+					<button class="btn-enforcement">Gửi</button>
+				</div>
+
+				<div class="sec-display-result">
+					<p class="result-binary-code">Mã nhị phân: </p>
+					<p class="result-get-ham-code">Mã Hamming: </p>
+					<p class='result-new-ham-code'>Mã Hamming mới: </p>
+				</div>
+			</div>
+		</div>
+		<div class="section-check">
+			<div class="get-hamming-code">
+				<h3 class="title" style="margin-bottom: 0px; color: red;">Phần lấy mã Hamming từ 1 binary code của 1 kí tự hay 1 binary code bất kì ...!</h3>
+				<div class="ham-code-1">
+					<p class="connect-lesson">
+						<a href="https://www.youtube.com/watch?v=373FUw-2U2k">Phần kiểm tra 1: </a>
+						<span> 10011010 </span>
+					</p>
+					<img src="images/ham-code-1.png" alt="">
+				</div>
+				<div class="ham-code-2">
+					<p class="connect-lesson">
+						<a href="https://www.youtube.com/watch?v=xXeXijCTn44&t=1482s">Phần kiểm tra 2 (16:53 & 28:37): </a>
+						<span> 10011100 </span>
+					</p>
+					<img src="images/ham-code-2.png" alt="">
+				</div>
+				<div class="ham-code-3">
+					<p class="connect-lesson">
+						<a href="https://www.youtube.com/watch?v=TYwrHiQ2-G4">Phần kiểm tra 3: </a>
+						<span> 01001101 </span>
+					</p>
+					<img src="images/ham-code-3.png" alt="">
+				</div>
+				
+			</div>
+		</div>
+	</div>
+	<script>
+		var btn_enforcement = document.querySelector('.btn-enforcement');
+		var in_text = document.querySelector('.in-bi-ham');
+		var r_character_in = document.querySelector('.radio-character-in');
+		var r_hamming_code = document.querySelector('.radio-hamming-code');
+		var r_get_ham_code = document.querySelector('.radio-get-ham-code');
+
+		var d_binary_code = document.querySelector('.result-binary-code');
+		var d_ham_code = document.querySelector('.result-get-ham-code');
+		var d_new_ham_code = document.querySelector('.result-new-ham-code');
+
+		var b_character_in = false, b_hamming_code = false, b_get_ham_code = false;
+
+
+		run_event();
+		function run_event(){
+			r_character_in.addEventListener('click',()=>{
+				b_character_in = !b_character_in; b_hamming_code = false; b_get_ham_code = false;
+				r_hamming_code.classList.remove('elem_clicked');
+				r_get_ham_code.classList.remove('elem_clicked');
+				r_character_in.classList.toggle('elem_clicked');
+			},false);
+
+			r_get_ham_code.addEventListener('click',()=>{
+				b_get_ham_code = !b_get_ham_code; b_character_in = false; b_hamming_code = false;
+				r_character_in.classList.remove('elem_clicked');
+				r_hamming_code.classList.remove('elem_clicked');
+				r_get_ham_code.classList.toggle('elem_clicked');
+			},false);
+
+			r_hamming_code.addEventListener('click',()=>{
+				b_hamming_code = !b_hamming_code; b_character_in = false; b_get_ham_code = false;
+				r_character_in.classList.remove('elem_clicked');
+				r_get_ham_code.classList.remove('elem_clicked');
+				r_hamming_code.classList.toggle('elem_clicked');
+			},false);
+
+			btn_enforcement.addEventListener('click',run,false);
+		}
+
+
+
+		function run(){
+			if((in_text.value).trim()){
+				if(b_get_ham_code || b_character_in || b_hamming_code){
+					if(b_character_in){
+						if((in_text.value).trim().length === 1){
+							let arr_balance = re_binary_code(in_text.value.charCodeAt(0));
+							d_binary_code.innerHTML = "Mã nhị phân: " + arr_balance.join("");
+						}else{
+							alert('Bạn Không Chỉ Được Nhập Vào 1 Kí Tự...!')
+						}
+					}
+
+					if(b_get_ham_code){
+						let ham_code = re_hamming_code(in_text.value.split(""));
+						d_ham_code.innerHTML = "Mã Hamming: " + ham_code;
+					}
+
+					if(b_hamming_code){
+						re_new_ham_code(in_text.value.split(""));
+					}
+				}else{
+					alert("Bạn Phải Chọn 1 Trong 3 Kiểu Để Thực Thi...!");
+				}
+			}else{
+				alert('Bạn Không Được Để Chống Ô Nhập Giá Trị...!')
+			}
+		}
+
+		function re_binary_code(character_in){
+			let arr_balance = [];
+			let section_int = character_in;
+			while(arr_balance.length !== 8){
+				arr_balance.unshift(section_int%2);
+				section_int = Math.floor(section_int/2);
+			}
+			b_character_in = false;
+			r_character_in.classList.remove('elem_clicked');
+			return arr_balance;
+		}
+
+		function re_hamming_code(in_binary_code){
+			// let message = [1,0,1,1];
+			// let message = [1,0,0,1,1,0,1,0];
+			// let message = [0,1,0,0,1,1,0,1];
+			console.log('in_binary_code - ' + in_binary_code);
+			let message = in_binary_code;
+			let sub_message = [...message];
+			let num_check_bit = re_num_check_bit(message);
+			let num_bit_position = num_check_bit + message.length;
+			let arr_position_number = re_position_number(num_bit_position,num_check_bit);
+			let arr_objs_bp_pn_vb = [];
+			let arr_check_bit = re_arr_check_bits(num_bit_position);
+
+			for(let i = 0; i < num_bit_position; i++){
+				arr_objs_bp_pn_vb.push({
+					bit_position: i+1,
+					position_number: arr_position_number[i],
+					val_bit: (arr_check_bit.indexOf(i+1) < 0)?Number(sub_message[0]):0
+				});
+				if(arr_check_bit.indexOf(i+1) < 0){ sub_message.shift(); }
+			}
+
+			for(let elem_bit of arr_check_bit){
+				let index = arr_check_bit.indexOf(elem_bit) + 1;
+				let total_bit_1 = 0;
+				for(let obj_bp_pn_vb of arr_objs_bp_pn_vb){
+					let len_p_number = obj_bp_pn_vb['position_number'].length;
+					if(obj_bp_pn_vb['position_number'][len_p_number - index] === 1){
+						total_bit_1 += obj_bp_pn_vb['val_bit'];
+					}
+					/*console.log('total_bit_1 - ' + total_bit_1);
+					console.log('obj_bp_pn_vb[bit_position] - ' + obj_bp_pn_vb['bit_position']);
+					console.log('vi tris - ' + (len_p_number));
+					console.log('co phai 1 ko - ' + obj_bp_pn_vb['position_number'][len_p_number - index]);
+					console.log('------------');*/
+				}
+				for(let obj_bp_pn_vb of arr_objs_bp_pn_vb){
+					if(obj_bp_pn_vb['bit_position'] === elem_bit){
+						obj_bp_pn_vb['val_bit'] = (total_bit_1%2===0)?0:1
+					}
+				}
+				/*console.log('total_bit_1 - ' + total_bit_1);*/
+			}
+			console.log(arr_objs_bp_pn_vb);
+
+			let str_new_ham_code = "";
+			for(let obj_bp_pn_vb of arr_objs_bp_pn_vb){
+				str_new_ham_code+=obj_bp_pn_vb['val_bit'];
+			}
+			/*console.log("arr_objs_bp_pn_vb -- ");
+			console.log(arr_objs_bp_pn_vb);
+			console.log('----------------');
+			console.log('Ma Hamming - ' + str_new_ham_code);*/
+			return str_new_ham_code;
+		}
+
+		function re_arr_check_bits(num_bit_position){
+			let arr_check_bit = [];
+			let i = 0;
+			while(Math.pow(2,i)<= num_bit_position){
+			  arr_check_bit.push(Math.pow(2,i))
+			  i++;
+			}
+			return arr_check_bit;
+		}
+
+		function re_num_check_bit(binary_code){
+			let len_data_bit = binary_code.length;
+			for(let i = 1; i <= 100; i++){
+				if((Math.pow(2,i)-1) >= len_data_bit + i){
+					return i;
+				}
+			}
+		}
+
+		function re_position_number(len_bit,num_check_bit){
+			let arr_position_number = [];
+			for(let i = 1; i <= len_bit; i++){
+				let len_binary_code = re_binary_code(i.toString()).length;
+				arr_position_number.push(re_binary_code(i).slice(len_binary_code - num_check_bit,len_binary_code));
+			}
+			return arr_position_number;
+		}
+
+		function re_new_ham_code(hamming_code){
+			let len_hamming_code = hamming_code.length;
+			let arr_check_bit = re_arr_check_bits(len_hamming_code);
+			let new_binary_code = re_new_binary_code(len_hamming_code,arr_check_bit,hamming_code);
+			console.log('new_binary_codenew_binary_code');
+			console.log(new_binary_code);
+		}
+
+		function re_new_binary_code(len_ham_code,arr_check_bit,hamming_code){
+			let arr_data_bit = [];
+			let str_binary_code = "";
+			for(let i = 1; i <= len_ham_code; i++){
+				let b_check_bit = true;
+				for(let c_bit of arr_check_bit){
+					b_check_bit = (c_bit === i)?false:b_check_bit;
+				}
+				if(b_check_bit){arr_data_bit.push(i);}
+			}
+
+			for(let data_bit of arr_data_bit){
+				str_binary_code += hamming_code[data_bit-1];
+			}
+			return Number(str_binary_code);
+		}
+	</script>
+</body>
+</html>
