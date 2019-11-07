@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Thuật Toán Checksum</title>
+</head>
+<body>
+	<style>
+		#wrapper{
+			width: 900px;
+		    height: 450px;
+		    border-radius: 5px;
+		    background: #eaeaea;
+		    margin: auto;
+		    padding: 10px;
+		    box-sizing: border-box;
+		}
+		.title-checksum{
+			text-align: center;
+			font-size: 24px;
+			margin: 15px auto 30px;
+		}
+		.container{
+			width: 90%;
+			margin: auto;
+			
+		}
+		.request-for-user,.display-result{
+		    margin: 5px;
+		    text-align: center;
+		    font-size: 18px;
+		}
+		.form-checksum{
+		    width: 30%;
+    		margin: 0px auto 50px;
+		}
+	</style>
+	<div id="wrapper">
+		<h4 class="title-checksum">
+			Thuật toán Checksum.
+		</h4>
+		<div class="container">
+			<p class="request-for-user"> Nhập chuỗi kí để lấy mã checksum! </p>
+			<form action="" class="form-checksum" onsubmit="return mySubmitFunction(event)">
+				<input type="text" class="in-character"> 
+				<input type="submit" value="Gửi" class="in-submit">
+			</form>
+			<p class="display-result"></p>
+		</div>
+	</div>
+	<script>
+		function mySubmitFunction(e)
+		{
+			e.preventDefault();
+			return false;
+		}
+
+		var in_characters = document.querySelector('.in-character');
+		var in_submit = document.querySelector('.in-submit');
+		var p_display_result = document.querySelector('.display-result');
+		var sum_bits = 16;
+		var total = 0;
+
+		in_submit.addEventListener('click',() => {
+			run();
+		},false);
+
+		function run()
+		{
+			let val_in_characters = in_characters.value;
+			let binary_code_characters = [];
+			let binary_code_16bit = [];
+			let checksum_code = null;
+			if(val_in_characters.trim() === null){
+				alert("Bạn ko được để chống...!");
+				return;
+			}
+			let num_characters = val_in_characters.length;
+			let even_num_characters = (num_characters%2 === 0)?num_characters:num_characters-1;
+			for(let character of val_in_characters){
+				binary_code_characters.push( re_binary_code(character.charCodeAt()) );
+			}
+
+			if(num_characters === 1){
+				binary_code_16bit.push([...binary_code_characters[0],...[0,0,0,0,0,0,0,0]]);
+			}else{
+				for(let i = 0; i< num_characters;i+=2){
+					binary_code_16bit.push([...binary_code_characters[i],...binary_code_characters[i+1]]);
+					if(num_characters - binary_code_16bit.length*2 === 1){
+						binary_code_16bit.push([...binary_code_characters[num_characters - 1],...[0,0,0,0,0,0,0,0]]);
+						break;
+					}
+				}
+			}
+
+			checksum_code =  binary_code_16bit.reduce((arr_16bit_1,arr_16bit_2)=>{
+				return re_checksum(arr_16bit_1,arr_16bit_2);
+			});
+
+			p_display_result.innerHTML = "Mã Checksum của " + val_in_characters + " là: " + checksum_code.join("");
+
+		}
+
+		function re_checksum(arr_16bit_1,arr_16bit_2){
+			let udb_checksum = [];
+			for(let i = sum_bits-1; i>=0; i--){
+				udb_checksum.unshift(re_sum_16bit(re_sum_16bit(total,arr_16bit_1[i]),arr_16bit_2[i]));
+			}
+			return udb_checksum.map((bit)=>{return (bit === 1)?0:1;});
+		}
+
+		function re_sum_16bit(bit_1,bit_2){
+			if(bit_1 === 1 && bit_2 === 1){
+				total = 1;
+				return 0;
+			}else{
+				total = (total !== bit_2)?0:total;
+				return (bit_1 === bit_2 && bit_1 !== 1)?0:1;
+			}
+		}
+
+		function re_binary_code(character_in){ // hàm này trả về mã nhị phân của kí tự đc truyền đến
+			let arr_balance = []; // mảng này lưu trữ các số dự khi chia 2
+			let section_int = character_in; // Bién này lấy giá trị nguyên khi chia 2
+			while(arr_balance.length !== 8){ // lặp cho đến khi chiều dài mã nhị phân của kí tự đc truyền vào = 8
+				arr_balance.unshift(section_int%2); // thêm số dư vào mảng 
+				section_int = Math.floor(section_int/2); // đặt lại giá trị nguyên cũ
+			}
+			return arr_balance;
+		}
+	</script>
+</body>
+</html>
