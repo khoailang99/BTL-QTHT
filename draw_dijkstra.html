@@ -5,50 +5,76 @@
 	<title>Document</title>
 </head>
 <style>
-	#btn-add-point-middle{
-		position: absolute;
-	    top: 40%;
-	    border: none;
-	    border-radius: 5px;
-	    padding: 10px;
-	    font-size: 16px;
-	    cursor: pointer;
-	    outline: none;
+	#btn-add-point-middle,.btn-smallest-path{
+		/* position: absolute; */
+		/* top: 40%; */
+		border: none;
+		border-radius: 5px;
+		padding: 10px;
+		font-size: 16px;
+		cursor: pointer;
+		outline: none;
 	}
 	.note{
-		position: absolute;
-	    top: 45%;
+		/* position: absolute;
+			    top: 45%; */
 	    font-style: italic;
+	}
+	.container-note{
+		position: absolute;
+		left: 5px;
+		top: 10px;
+	}
+	h1,h2,h3,h4,p{
+		margin: 7px;
 	}
 
 </style>
 <body>
-<p style="font-style: italic">
-	*Note: <br>
-	Màu Đỏ : Điểm đã được chọn để nối! <br>
-	Màu Xanh : Điểm Trung Gian!
-</p>
-<button id='btn-add-point-middle'> Thêm điểm trung gian </button>
-<p class="note">Bước 1: Chọn điểm bắt đầu ( nếu chưa có) <br> Bước 2: Chọn điểm trung gian <br> Bước 3 : Chọn điểm kết thúc </p>
-<canvas id="myCanvas" width="1200" height="850" style="border:2px solid #d3d3d3; margin: 50px 300px;">
+<h4 class="title-hamming" style="text-align: center; font-size: 24px;"> Vẽ Thuật Toán Dijkstra</h4>
+<div class="container-smallest-path">
+	<p class="d-num-small-path-value" style="text-align: center; font-size: 24px;"></p>
+	<p class="list-smallest-path" style="text-align: center; font-size: 24px;"> Danh sách các đường đi ngắn nhất là: </p>
+	<div class="section-display-sp" style="width: 15%; margin: auto;"></div>
+</div>
+<div class="container-note">
+	<p style="font-style: italic">
+		*Note: <br>
+		Màu Đỏ : Điểm đã được chọn để nối! <br>
+		Màu Xanh Nước Biển: Điểm Trung Gian! <br>
+		Màu Xanh Lá Cây : Vẽ đường đi ngắn nhất!
+	</p>
+	<button id='btn-add-point-middle' style="display: block; margin-bottom: 7px;"> Thêm điểm trung gian </button>
+	<button class="btn-smallest-path"> Vẽ đường đi ngắn nhất </button>
+	<p class="note">Bước 1: Chọn điểm bắt đầu ( nếu chưa có) <br> Bước 2: Chọn điểm trung gian <br> Bước 3 : Chọn điểm kết thúc </p>
+</div>
+<canvas id="myCanvas" width="1200" height="650" style="border:2px solid #d3d3d3; margin: 50px 300px;">
 Your browser does not support the HTML5 canvas tag.</canvas>
 
 <script>
 
 var html_canvas=document.getElementById("myCanvas");
 var btn_add_point_middle = document.getElementById('btn-add-point-middle');
+var btn_draw_smallest_path = document.querySelector('.btn-smallest-path');
 var btn_restore = document.getElementById('btn-restore');
+var d_num_small_path_value = document.querySelector('.d-num-small-path-value');
+var section_display_sp = document.querySelector('.section-display-sp');
+
 var ctx=html_canvas.getContext("2d");
 var alpha = [0,'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
-var row = 10, col = 15;
+var row = 7, col = 15;
 var x_original = y_original = size_square = 70;
+
 var coor_points = [];
 var coor_point_middle = [];
 var btn_point_middle_clicked = false;
-var cc;
+var btn_smallest_path_clicked = false;
+var arr_colors = ["#264E36","#3F69AA","#F96714"];
+
+var arr_coor_peak_clicked = [];
+var points_start_middle_end = [];
 
 var radius = 6;
-
 
 ctx.font = "20px Arial";
 for(let i = 1; i <= col+1; i++){
@@ -72,10 +98,7 @@ for(let j = 1; j<=row+1; j++){
     }
 }
 
-
 add_circle();
-
-
 function add_circle(){
 	for(let i = 2; i <= row; i++){
 		for(let j = 2; j<= col; j++){
@@ -121,6 +144,104 @@ btn_add_point_middle.addEventListener('click',function(){
 	}
 },false)
 
+btn_draw_smallest_path.addEventListener('click', function(){
+	// let arr_smallest_path = [["A","C","F"],["A","D","F"],["A","C","D","F"]];
+	if(coor_points.length === 0){
+		alert("Bạn phải vẽ hình sau đó mới in ra được các đường đi ngắn nhất...!");
+		return;
+	}
+	let arr_smallest_path = [];
+	let var_run_color = 0
+	let str_smallest_path = localStorage.getItem('arr_smallest_path').split("-");
+	for(let a_smallest_path of str_smallest_path){
+		arr_smallest_path.push([...a_smallest_path.split(",")]);
+	}
+
+	btn_smallest_path_clicked = !btn_smallest_path_clicked;
+	this.style.color = "red";
+	for(let smallest_path of arr_smallest_path){
+		f_draw_smallest_path(smallest_path,arr_colors[var_run_color]);
+		var_run_color++;
+	}
+	f_display_info_dijkstra(arr_smallest_path);
+}, false);
+
+function f_draw_smallest_path(smallest_paths_reverse,color){
+	coor_points = [];
+	coor_point_middle = [];
+	let check_curve = false;
+	let smallest_paths = [];
+	for(let i = smallest_paths_reverse.length-1; i>=0; i--){
+		smallest_paths.push(smallest_paths_reverse[i]);
+	}
+
+	for(let i = 0; i < smallest_paths.length; i++){
+		for(let peak of arr_coor_peak_clicked){
+			if(peak['name_peak'] === smallest_paths[i] && peak['is_middle'] !== true){
+				coor_points.push(peak);
+			}else{
+				if(peak['is_middle'] === true && i === smallest_paths.length - 1){
+					coor_point_middle.push(peak);
+				}
+			}
+		}
+	}
+
+	console.log('coor_points');
+	console.log(coor_points);
+	console.log('^------------^');
+	console.log("points_start_middle_end");
+	console.log(points_start_middle_end);
+	console.log('^------------^');
+	console.log('coor_point_middle');
+	console.log(coor_point_middle);
+
+
+	for(let i = 0; i < smallest_paths.length-1; i++){
+		check_curve = false;
+		ctx.beginPath();
+		ctx.moveTo(coor_points[i]["coor_x"]*size_square,coor_points[i]["coor_y"]*size_square);
+		for(let str_peaks_sme of points_start_middle_end){
+			console.log("2 diem trung gian");
+				console.log(coor_points[i]['name_peak']+coor_points[i+1]['name_peak'])
+			if(str_peaks_sme['name_peak_start_end'] === (coor_points[i]['name_peak']+coor_points[i+1]['name_peak'])){
+				
+				for(let point_middle of coor_point_middle){
+					if(point_middle['name_peak'] === str_peaks_sme['inter_point_name']){
+						ctx.quadraticCurveTo(point_middle['coor_x']*size_square, point_middle['coor_y']*size_square , coor_points[i+1]["coor_x"]*size_square,coor_points[i+1]["coor_y"]*size_square);
+						check_curve = true;
+						break;
+					}
+				}
+				break;
+			}
+		}
+		if(!check_curve){
+			ctx.lineTo(coor_points[i+1]["coor_x"]*size_square,coor_points[i+1]["coor_y"]*size_square);
+		}
+		ctx.lineWidth = 4;
+		ctx.strokeStyle = "#3F69AA";
+		ctx.stroke();
+	}
+}
+
+function f_display_info_dijkstra(arr_smallest_path){
+	let arr_sp_lp_nsp_value = localStorage.getItem('info_display_dijkstra').split(',');
+	let str_smallest_paths = "";
+	d_num_small_path_value.innerHTML = "Đường đi ngắn nhất từ: " + arr_sp_lp_nsp_value[0] + " --> " + arr_sp_lp_nsp_value[1] + " - Có số đường đi ngắn nhất là: " + arr_sp_lp_nsp_value[2] + " - Giá trị là: " + arr_sp_lp_nsp_value[3];
+	for(let a_smallest_path of arr_smallest_path){
+		let para = document.createElement("p");
+		let node = null;
+		for(let i = a_smallest_path.length-1; i>=0; i--){
+			str_smallest_paths += a_smallest_path[i] + ((i === 0)?"":" -> ");
+		}
+		node = document.createTextNode(str_smallest_paths);
+		para.appendChild(node);
+		section_display_sp.appendChild(para);
+		str_smallest_paths = "";
+		section_display_sp.appendChild(document.createElement("p"));
+	}
+}
 
 html_canvas.addEventListener('click', relMouseCoords, false);
 function relMouseCoords(event){
@@ -162,6 +283,33 @@ function relMouseCoords(event){
     if(check_limit && coor_y_clicked != null){
     	coor_point_clicked['x'] = coor_x_clicked;
     	coor_point_clicked['y'] = coor_y_clicked;
+
+    	if(arr_coor_peak_clicked.length === 0){
+    		arr_coor_peak_clicked.push({
+	    		name_peak: alpha[coor_x_clicked - 1],
+	    		coor_x: coor_x_clicked,
+	    		coor_y: coor_y_clicked,
+	    		is_middle : btn_point_middle_clicked?true:false
+	    	});
+    	}else{
+    		let b_already_exist = false;
+    		for(let i = 0; i<arr_coor_peak_clicked.length; i++){
+	    		b_already_exist = (alpha[coor_x_clicked - 1] === arr_coor_peak_clicked[i]['name_peak'])?true:false;
+	    		if(b_already_exist){break;}
+	    	}
+	    	if(!b_already_exist || btn_point_middle_clicked){
+    			arr_coor_peak_clicked.push({
+		    		name_peak: alpha[coor_x_clicked - 1],
+		    		coor_x: coor_x_clicked,
+		    		coor_y: coor_y_clicked,
+		    		is_middle : btn_point_middle_clicked?true:false
+		    	});
+    		}
+    	}
+
+    	// console.log('arr_coor_peak_clicked');
+    	console.log(arr_coor_peak_clicked);
+
 		ctx.beginPath();
 		ctx.arc(coor_x_clicked*size_square, coor_y_clicked*size_square, radius+4, 0, 2 * Math.PI, false);
 	    if(btn_point_middle_clicked){
@@ -184,22 +332,23 @@ function relMouseCoords(event){
     		ctx.moveTo(coor_points[0]["x"]*size_square,coor_points[0]["y"]*size_square); // A
     		if(coor_point_middle.length === 1){
     			ctx.quadraticCurveTo(coor_point_middle[0]['x']*size_square, coor_point_middle[0]['y']*size_square , coor_points[1]["x"]*size_square,coor_points[1]["y"]*size_square);
+    			points_start_middle_end.push({
+    				inter_point_name : alpha[coor_point_middle[0]['x']-1],
+    				name_peak_start_end: alpha[coor_points[0]['x']-1]+alpha[coor_points[1]['x']-1]
+    			});
 				coor_point_middle.shift();
     		}else{
 				ctx.lineTo(coor_points[1]["x"]*size_square,coor_points[1]["y"]*size_square); // B
     		}
 			// ctx.lineTo(coor_points[1]["x"]*size_square,coor_points[1]["y"]*size_square); // B
 			ctx.lineWidth = 2;
-			ctx.strokeStyle = "#FF0000";
+			ctx.strokeStyle = (btn_smallest_path_clicked)?'green':"#FF0000";
 			ctx.stroke();
 			coor_points.shift();
     	}
     }
 
-
-
-    console.log('x- ' + coor_point_clicked['x'] + ' y- ' + coor_point_clicked['y']);
-    console.log('td-x -- '+canvasX + ' td-y -- ' + canvasY);
+    // console.log('x- ' + coor_point_clicked['x'] + ' y- ' + coor_point_clicked['y']);
 }
 HTMLCanvasElement.prototype.relMouseCoords = relMouseCoords;
 
