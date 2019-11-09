@@ -2,220 +2,144 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<title>Document</title>
+	<title>Thuật Toán Dijkstra</title>
+	<script src="data_dijkstra.js"></script>
 </head>
 <body>
-	<script>
-		var info_peaks = [
-			{
-				name_peak : 'A',
-				sides : [
-					{
-						name_side: 'AB',
-						s_val_straight_para: 3,
-						next_peak : 'B'
-					},
-					{
-						name_side: 'AC',
-						s_val_straight_para: 2,
-						next_peak : 'C'
-					},
-					{
-						name_side: 'AD',
-						s_val_straight_para: 8,
-						next_peak : 'D'
-					}
-				],
-				location_in_alpha: 1,
-				side_peaks_min: [
-					{
-						spm_val_straight_para : Infinity,
-						smallest_peak : null
-					}
-				]
-			},
-			{
-				name_peak : 'B',
-				sides : [
-					{
-						name_side: 'BA',
-						s_val_straight_para: 3,
-						next_peak : 'A'
-					},
-					{
-						name_side: 'BC',
-						s_val_straight_para: 3,
-						next_peak : 'C'
-					},
-					{
-						name_side: 'BD',
-						s_val_straight_para: 2,
-						next_peak : 'D'
-					},
-					{
-						name_side: 'BE',
-						s_val_straight_para: 2,
-						next_peak : 'E'
-					}
-				],
-				location_in_alpha: 2,
-				side_peaks_min: [
-					{
-						spm_val_straight_para : 0,
-						smallest_peak : null
-					}
-				]
-			},
-			{
-				name_peak : 'C',
-				sides : [
-					{
-						name_side: 'CA',
-						s_val_straight_para: 2,
-						next_peak : 'A'
-					},
-					{
-						name_side: 'CB',
-						s_val_straight_para: 3,
-						next_peak : 'B'
-					},
-					{
-						name_side: 'CD',
-						s_val_straight_para: 9,
-						next_peak : 'D'
-					},
-					{
-						name_side: 'CE',
-						s_val_straight_para: 1,
-						next_peak : 'E'
-					},
-					{
-						name_side: 'CF',
-						s_val_straight_para: 5,
-						next_peak : 'F'
-					}
-				],
-				location_in_alpha: 3,
-				side_peaks_min: [
-					{
-						spm_val_straight_para : Infinity,
-						smallest_peak : null
-					}
-				]
-			},
-			{
-				name_peak : 'D',
-				sides : [
-					{
-						name_side: 'DA',
-						s_val_straight_para: 8,
-						next_peak : 'A'
-					},
-					{
-						name_side: 'DB',
-						s_val_straight_para: 2,
-						next_peak : 'B'
-					},
-					{
-						name_side: 'DC',
-						s_val_straight_para: 9,
-						next_peak : 'C'
-					},
-					{
-						name_side: 'DE',
-						s_val_straight_para: 1,
-						next_peak : 'E'
-					},
-					{
-						name_side: 'DF',
-						s_val_straight_para: 1,
-						next_peak : 'F'
-					}
-				],
-				location_in_alpha: 4,
-				side_peaks_min: [
-					{
-						spm_val_straight_para : Infinity,
-						smallest_peak : null
-					}
-				]
-			},
-			{
-				name_peak : 'E',
-				sides : [
-					{
-						name_side: 'ED',
-						s_val_straight_para: 1,
-						next_peak : 'D'
-					},
-					{
-						name_side: 'EF',
-						s_val_straight_para: 3,
-						next_peak : 'F'
-					},
-					{
-						name_side: 'EC',
-						s_val_straight_para: 1,
-						next_peak : 'C'
-					},
-					{
-						name_side: 'EB',
-						s_val_straight_para: 2,
-						next_peak : 'E'
-					}
-				],
-				location_in_alpha: 5,
-				side_peaks_min: [
-					{
-						spm_val_straight_para : Infinity,
-						smallest_peak : null
-					}
-				]
-			},
-			{
-				name_peak : 'F',
-				sides : [
-					{
-						name_side: 'FD',
-						s_val_straight_para: 1,
-						next_peak : 'D'
-					},
-					{
-						name_side: 'FE',
-						s_val_straight_para: 3,
-						next_peak : 'E'
-					},
-					{
-						name_side: 'FC',
-						s_val_straight_para: 5,
-						next_peak : 'C'
-					}
-				],
-				location_in_alpha: 6,
-				side_peaks_min: [
-					{
-						spm_val_straight_para : Infinity,
-						smallest_peak : null
-					}
-				]
-			}
-		];
+	<style>
+		.container{
+		    width: 900px;
+		    height: 750px;
+		    border-radius: 5px;
+		    background: #dad7d7;
+		    margin: 10px auto;
+		    padding: 10px;
+		    box-sizing: border-box;
+		    font-size: 23px;
+		    position: relative;
+		}
+		.section-link-draw-dijkstra a{
+		    color: #d42222;
+		    position: absolute;
+		    bottom: 10px;
+		    left: 37%;
+		}
+		h1,h2,h3,h4,h5,h6{margin: 0;}
+		p{margin: 5px;}
+		table, th, td {
+		    border: 1px solid black;
+		    border-collapse: collapse;
+		    width: 170px;
+		    text-align: center;
+		    height: 45px;
+		}
+	</style>
+	<div class="wrapper">
+		<h4 class="title-hamming" style="text-align: center; font-size: 25px;"> Thuật Toán Dijkstra</h4>
+		<div class="container">
+			<div class="section-enter" style="margin-bottom: 10px;">
+				<h3 class="title-choose-exercise">Chọn Đề</h3>
+				<form>
+				  <select id="list-exercise-test" name="exercise" size = "5">
+					  <option value="0">Đề 1</option>
+					  <option value="1">Đề 2</option>
+					  <option value="2">Đề 3</option>
+					  <option value="3">Đề 4</option>
+					  <option value="4">Đề 5</option>
+				  </select>
+				</form>
+			</div>
+			<div class="section-point-start">
+				<!-- <form> -->
+					<label for="">Điểm Bắt Đầu: </label>
+					<input type="text" class="in-point-start"> <br>
+					<label for="">Điểm Kết Thúc: </label>
+					<input type="text" class="in-point-end"> <br>
+					<button class="btn-send-p-start-end"> Kết Quả </button>
+				<!-- </form> -->
+			</div>
+			
+			<div class="sec-display-smallest-paths" style="margin: 15px 0px;">
+				<p style="font-size: 25px;"> Bảng chứa các đỉnh có trong các đường đi ngắn nhất...! </p>
+				<table class="detail-table-smallest-paths"></table>
+			</div>
 
-		var arr_smallest_peak = ["B"];
-		var len_arr_smallest_peak = arr_smallest_peak.length;
+			<div class="section-display-result">
+				<p class="num-smallest-path"></p>
+				<p>Đường đi của chúng là : </p>
+			</div>
+			
+			<div class="section-link-draw-dijkstra">
+				<a href="draw_dijkstra.html" class=""> Vẽ đường đi ngắn nhất...!</a>
+			</div>
+		</div>
+	</div>
+	<script>
+		var info_peaks = null;
+		var arr_smallest_peak = [];
 		var peaks = ['A','B','C','D','E','F'];
-		var start_peak = 'B',last_peak = 'F';
-		// var arr_peaks_shortest_path = ['F'];
+		var start_peak = null,last_peak = null;
 		
 		var edges_peak_smallest_eq = [];
-		var sub_smallest_peak = ['F'];
+		var sub_smallest_peak = [];
 		var parent_smallest_peak = [];
+		var arr_contain_only_sp = [];
+		var num_exercise = null;
 
+		var d_smallest_path = document.querySelector('.num-smallest-path');
+		var section_display_result = document.querySelector('.section-display-result');
+		var select_exercise = document.querySelector('#list-exercise-test');
+		var btn_send_p_start_end = document.querySelector('.btn-send-p-start-end');
+		var detail_table_smallest_paths = document.querySelector('.detail-table-smallest-paths');
 
-		run();
+		select_exercise.addEventListener('click',()=>{
+			if(select_exercise.value !== num_exercise && num_exercise !== null){
+				window.location.reload();
+			}
+			num_exercise = select_exercise.value;
+			info_peaks = arr_np_sides_l_ssm[Number(num_exercise)];
+
+			/*for(let peak of info_peaks){
+				console.log('^-------------------------^');
+				console.log("Đỉnh: " + peak['name_peak']);
+				for(let side of peak['sides']){
+					console.log('Đoạn: ' + side['name_side'] + ' - Giá Trị: ' + side['s_val_straight_para']);
+					console.log('---')
+				}
+				console.log('^-------------------------^');
+			}*/
+		},false)
+
+		btn_send_p_start_end.addEventListener('click',()=>{
+			if(info_peaks === null){
+				alert("Bạn phải chọn đề...!");
+			}else{
+				let point_start = (document.querySelector('.in-point-start').value).trim().toUpperCase();
+				let point_end = (document.querySelector('.in-point-end').value).trim().toUpperCase();
+				if(point_start === "" || point_end === ""){
+					alert('Bạn Không Được Để Chống...!');
+				}else{
+					arr_smallest_peak.push(point_start);
+					start_peak = point_start;
+					last_peak = point_end;
+					sub_smallest_peak.push(last_peak);
+
+					for(let peak of info_peaks){
+						if(peak['name_peak'] === point_start){
+							peak['side_peaks_min'][peak['side_peaks_min'].length-1]['spm_val_straight_para'] = 0;
+							run();
+						}
+					}
+				}
+			}
+		},false)
+
 		function run(){
-			while (arr_smallest_peak[len_arr_smallest_peak-1] !== last_peak) {
-				if(arr_smallest_peak[len_arr_smallest_peak-1] === last_peak){ break;}
+			let str_smallest_paths = "";
+			let smallest_path = 0;
+			let str_smallest_paths_ls = "";
+			while (arr_smallest_peak[arr_smallest_peak.length-1] !== last_peak) {
+				if(arr_smallest_peak[arr_smallest_peak.length-1] === last_peak){ break;}
 				for(let peak of info_peaks){
 					if(peak['name_peak'] === arr_smallest_peak[arr_smallest_peak.length-1]){
 						let len_side_peaks_min = peak['side_peaks_min'].length;
@@ -245,14 +169,71 @@
 					}
 				}
 			}
+			console.log("^---info_peaks---^")
 			console.log(info_peaks)
-			console.log('---- info_peaks ----');
-			
+			console.log("^---info_peaks---^")
+
 			add_arr_epse();
 			r_shortest_path();
 
-			console.log(parent_smallest_peak);
-			console.log('------- parent_smallest_peak --------');
+			// Lấy giá trị đường đi ngắn nhất
+			for(let s_edge of info_peaks){
+				if(s_edge['name_peak'] === last_peak){
+					smallest_path = s_edge['side_peaks_min'][s_edge['side_peaks_min'].length-1]['spm_val_straight_para']
+				}
+			}
+			d_smallest_path.innerHTML = "Số đường đi ngắn nhất là: " + parent_smallest_peak.length + " - Giá trị: " + smallest_path;
+
+			for(let a_smallest_path of parent_smallest_peak){
+				let para = document.createElement("p");
+				let node = null;
+				for(let i = a_smallest_path.length-1; i>=0; i--){
+					str_smallest_paths += a_smallest_path[i] + ((i === 0)?"":" -> ");
+				}
+				node = document.createTextNode(str_smallest_paths);
+				para.appendChild(node);
+				section_display_result.appendChild( para);
+				str_smallest_paths = "";
+				section_display_result.appendChild(document.createElement("p"));
+			}
+
+			f_display_table_change();
+
+			for(let s_smallest_paths of parent_smallest_peak){
+				str_smallest_paths_ls += s_smallest_paths.join(",") + "-";
+			}
+
+			localStorage.setItem("arr_smallest_path",str_smallest_paths_ls.substr(0,str_smallest_paths_ls.length-1));
+			localStorage.setItem("info_display_dijkstra",start_peak + ',' + last_peak + ',' + parent_smallest_peak.length + ',' + smallest_path);
+
+			console.log("^---arr_contain_only_sp---^");
+			console.log(arr_contain_only_sp);
+			console.log("^---arr_contain_only_sp---^");
+
+		}
+
+		function f_display_table_change(){
+			let num_col = null;
+			for(let name_peak_and_spm of arr_contain_only_sp){
+				num_col = (name_peak_and_spm['side_peaks_min'].length > num_col)?name_peak_and_spm['side_peaks_min'].length:num_col;
+			}
+			for(let name_peak_and_spm of arr_contain_only_sp){
+				let row = document.createElement("tr");
+				f_append_row(row,name_peak_and_spm['name_peak']);
+				for(let spm of name_peak_and_spm['side_peaks_min']){
+					f_append_row(row,spm);
+				}
+				if(name_peak_and_spm['side_peaks_min'].length !== num_col){
+					for(let i = 0; i < num_col-1; i++){f_append_row(row,"");}
+				}
+				detail_table_smallest_paths.appendChild(row);
+			}
+		}
+
+		function f_append_row(row,value){
+			let col = document.createElement("td");
+			col.appendChild(document.createTextNode(value));
+			row.appendChild(col);
 		}
 
 		function add_arr_epse(){
@@ -273,7 +254,6 @@
 							elem_spm_equal['s_name_peak_min'] = side['smallest_peak'];
 							if(obj_spm['spm_equal'].length === 0){
 								obj_spm['spm_equal'].push(elem_spm_equal);
-
 							}else{
 								if(side['smallest_peak'] !== obj_spm['spm_equal'][obj_spm['spm_equal'].length-1]['s_name_peak_min']){
 									obj_spm['spm_equal'].push(elem_spm_equal);
@@ -285,23 +265,21 @@
 					edges_peak_smallest_eq.push(obj_spm);
 				}
 			}
+
+			for(let every_epse of edges_peak_smallest_eq){
+				let obj_spm_final = {
+					name_peak: every_epse['p_name_peak_min'],
+					side_peaks_min : []
+				};
+				for(let a_spm of every_epse['spm_equal']){
+					obj_spm_final['side_peaks_min'].push(a_spm['smallest_length']+','+a_spm['s_name_peak_min'])
+				}
+				arr_contain_only_sp.push(obj_spm_final);
+			}
 			console.log(edges_peak_smallest_eq);
 			console.log('----- edges_peak_smallest_eq --------')
 		}
-
 		function r_shortest_path(){
-			/*let len_apsp = arr_peaks_shortest_path.length;
- 			for(let peak of info_peaks){
-				if(peak['name_peak'] === arr_peaks_shortest_path[len_apsp-1]){
-					let len_side_peaks_min = peak['side_peaks_min'].length;
-					let ele_spm_last = peak['side_peaks_min'][len_side_peaks_min-1];
-					arr_peaks_shortest_path.push(ele_spm_last['smallest_peak']);
-					if(arr_peaks_shortest_path[len_apsp-1] !== start_peak){
-						r_shortest_path();
-					}
-				}
-			}*/
-
 			for(let elem_epse of edges_peak_smallest_eq){
 				if(elem_epse['p_name_peak_min'] === sub_smallest_peak[sub_smallest_peak.length-1]){
 					sub_smallest_peak.push(elem_epse['spm_equal'][0]['s_name_peak_min']);
@@ -317,7 +295,6 @@
 				}
 			}
 		}
-
 		function check_spm_equal(){
 			for(let peak_min of sub_smallest_peak){
 				for(let o_spm of edges_peak_smallest_eq){
@@ -333,9 +310,7 @@
 				}
 			}
 		}
-
 		function r_smallest_peak(){
-			// console.log(info_peaks);
 			let smallest_edeg = order_peak = Infinity;
 			let name_peak = '';
 			for(let peak of info_peaks){
@@ -356,31 +331,22 @@
 						order_peak = (peak['location_in_alpha'] < order_peak)?peak['location_in_alpha']:order_peak;
 						smallest_edeg = length_side;
 					}
-					/*console.log('name_peak - ' + name_peak);
-					console.log('order_peak - ' + order_peak);
-					console.log('smallest_edeg - ' + smallest_edeg);
-					console.log('-------');*/
-					// console.log('dinh-duoc-duyet: '+peak['name_peak'])
 				}
 			}
-			// console.log('dnn - '+name_peak);
 			arr_smallest_peak.push(name_peak);
-			len_arr_smallest_peak = arr_smallest_peak.length;
 		}
-
 		function add_side_peak_min(val_straight_para,next_peak,side_with_peak_min,location_peak){
-			// console.log('dinh_den_of_'+dinh_den+ ' - ' + next_peak);
 			if(arr_smallest_peak.indexOf(next_peak) < 0){
 				for(let peak of info_peaks){
 					if(peak['name_peak'] === next_peak){
+
 						let len_side_peaks_min = peak['side_peaks_min'].length;
 						let length_side = peak['side_peaks_min'][len_side_peaks_min-1];
 						let total = val_straight_para+side_with_peak_min;
 						if(total <= length_side['spm_val_straight_para']){
 							peak['side_peaks_min'].push({
 								spm_val_straight_para : total,
-								smallest_peak : arr_smallest_peak[len_arr_smallest_peak-1],
-								smallest_peak: (total === length_side['spm_val_straight_para'] && peak['location_in_alpha'] < location_peak)?length_side['smallest_peak']:arr_smallest_peak[len_arr_smallest_peak-1]
+								smallest_peak: (total === length_side['spm_val_straight_para'] && peak['location_in_alpha'] < location_peak)?length_side['smallest_peak']:arr_smallest_peak[arr_smallest_peak.length-1]
 							});
 						}else{
 							peak['side_peaks_min'].push({
@@ -393,7 +359,6 @@
 				}
 			}
 		}
-
 		// console.log(arr_smallest_peak_peak);
 		// console.log(info_peaks);ss
 	</script>
