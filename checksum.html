@@ -25,7 +25,7 @@
 			margin: auto;
 			
 		}
-		.request-for-user,.display-result{
+		.request-for-user,.display-result,.display-convert-checksum{
 		    margin: 5px;
 		    text-align: center;
 		    font-size: 18px;
@@ -45,6 +45,7 @@
 				<input type="text" class="in-character"> 
 				<input type="submit" value="Gửi" class="in-submit">
 			</form>
+			<p class="display-convert-checksum"></p>
 			<p class="display-result"></p>
 		</div>
 	</div>
@@ -58,6 +59,8 @@
 		var in_characters = document.querySelector('.in-character');
 		var in_submit = document.querySelector('.in-submit');
 		var p_display_result = document.querySelector('.display-result');
+		var display_convert_checksum = document.querySelector('.display-convert-checksum');
+
 		var sum_bits = 16;
 		var total = 0;
 
@@ -83,6 +86,7 @@
 
 			if(num_characters === 1){
 				binary_code_16bit.push([...binary_code_characters[0],...[0,0,0,0,0,0,0,0]]);
+				checksum_code = re_checksum([...binary_code_16bit[0]],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
 			}else{
 				for(let i = 0; i< num_characters;i+=2){
 					binary_code_16bit.push([...binary_code_characters[i],...binary_code_characters[i+1]]);
@@ -91,11 +95,10 @@
 						break;
 					}
 				}
+				checksum_code =  binary_code_16bit.reduce((arr_16bit_1,arr_16bit_2)=>{
+					return re_checksum([...arr_16bit_1],[...arr_16bit_2]);
+				});
 			}
-
-			checksum_code =  binary_code_16bit.reduce((arr_16bit_1,arr_16bit_2)=>{
-				return re_checksum(arr_16bit_1,arr_16bit_2);
-			});
 
 			p_display_result.innerHTML = "Mã Checksum của " + val_in_characters + " là: " + checksum_code.join("");
 
@@ -106,6 +109,7 @@
 			for(let i = sum_bits-1; i>=0; i--){
 				udb_checksum.unshift(re_sum_16bit(re_sum_16bit(total,arr_16bit_1[i]),arr_16bit_2[i]));
 			}
+			display_convert_checksum.innerHTML = "Mã nhị phân 16bit khi chưa đảo bit: " + udb_checksum.join("");
 			return udb_checksum.map((bit)=>{return (bit === 1)?0:1;});
 		}
 
